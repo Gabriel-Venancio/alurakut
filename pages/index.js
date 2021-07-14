@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import MainGrid from '../src/components/MainGrid'
 import Box from '../src/components/Box'
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons'
@@ -26,6 +26,27 @@ function ProfileSideBar(props) {
   );
 }
 
+function ProfileRelationsBox(props) {
+    return (
+        <ProfileRelationsBoxWrapper>
+            <h2 className="smallTitle">{props.title} ({props.items.length})</h2>
+            <ul>
+                {/* {seguidores.map((itemAtual) => {
+                              return (
+                                  <li key={itemAtual}>
+                                      <a
+                                          href={`https://github.com/${itemAtual}.png`}
+                                      >
+                                          <img src={itemAtual.image} />
+                                          <span>{itemAtual.title}</span>
+                                      </a>
+                                  </li>
+                              );
+                          })} */}
+            </ul>
+        </ProfileRelationsBoxWrapper>
+    );
+}
 
 export default function Home() {
   const githubUser = 'Gabriel-Venancio';
@@ -42,6 +63,19 @@ export default function Home() {
     'marcobrunodev',
     'felipefialho' 
   ]
+const [seguidores, setSeguidores ]= React.useState([]);
+React.useEffect(() => {
+    fetch(
+        "https://api.github.com/users/Gabriel-Venancio/followers"
+    )
+        .then(function (respostaDoServidor) {
+            return respostaDoServidor.json();
+        })
+        .then(function (respostaCompleta) {
+            setSeguidores(respostaCompleta);
+        });
+}, []);
+  
 
   return (
       <>
@@ -66,12 +100,14 @@ export default function Home() {
 
                               const comunidade = {
                                   id: new Date().toISOString(),
-                                  titulo: dadosDoForm.get('title'),
-                                  image: dadosDoForm.get('image'),
+                                  titulo: dadosDoForm.get("title"),
+                                  image: dadosDoForm.get("image"),
                               };
-                              const comunidadesAtualizadas = [...comunidades, comunidade];
+                              const comunidadesAtualizadas = [
+                                  ...comunidades,
+                                  comunidade,
+                              ];
                               setComunidades(comunidadesAtualizadas);
-
                           }}
                       >
                           <div>
@@ -98,27 +134,8 @@ export default function Home() {
                   className="profileRelationsArea"
                   style={{ gridArea: "profileRelationsArea" }}
               >
-                  <ProfileRelationsBoxWrapper>
-                      <h2 className="smallTitle">
-                          Pessoas da comunidade ({pessoasFavoritas.length})
-                      </h2>
-                      <ul>
-                          {pessoasFavoritas.map((itemAtual) => {
-                              return (
-                                  <li key={itemAtual}>
-                                      <a
-                                          href={`/users/${itemAtual}`}
-                                      >
-                                          <img
-                                              src={`https://github.com/${itemAtual}.png`}
-                                          />
-                                          <span>{itemAtual}</span>
-                                      </a>
-                                  </li>
-                              );
-                          })}
-                      </ul>
-                  </ProfileRelationsBoxWrapper>
+                  
+                <ProfileRelationsBox title="Seguidores" items={seguidores}/>
                   <ProfileRelationsBoxWrapper>
                       <h2 className="smallTitle">
                           Comunidades ({comunidades.length})
@@ -127,12 +144,28 @@ export default function Home() {
                           {comunidades.map((itemAtual) => {
                               return (
                                   <li key={itemAtual.id}>
-                                      <a
-                                          href={`/users/${itemAtual.title}`}
-                                      >
-                                          <img
-                                          src={itemAtual.image} />
+                                      <a href={`/users/${itemAtual.title}`}>
+                                          <img src={itemAtual.image} />
                                           <span>{itemAtual.title}</span>
+                                      </a>
+                                  </li>
+                              );
+                          })}
+                      </ul>
+                  </ProfileRelationsBoxWrapper>
+                  <ProfileRelationsBoxWrapper>
+                      <h2 className="smallTitle">
+                          Pessoas da comunidade ({pessoasFavoritas.length})
+                      </h2>
+                      <ul>
+                          {pessoasFavoritas.map((itemAtual) => {
+                              return (
+                                  <li key={itemAtual}>
+                                      <a href={`/users/${itemAtual}`}>
+                                          <img
+                                              src={`https://github.com/${itemAtual}.png`}
+                                          />
+                                          <span>{itemAtual}</span>
                                       </a>
                                   </li>
                               );
